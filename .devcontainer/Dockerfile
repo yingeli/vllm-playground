@@ -35,4 +35,4 @@ RUN userdel -r ubuntu && \
 USER coder
 
 # Set up Codex config
-COPY codex/ /home/coder/.codex/
+COPY .devcontainer/codex/ /home/coder/.codex/
