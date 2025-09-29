@@ -10,6 +10,7 @@ RUN apt-get update && \
     git \
     jq \
     locales \
+    nano \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
@@ -22,7 +23,8 @@ ENV LANGUAGE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
 # Remove the `ubuntu` user and add a user `coder` so that you're not developing as the `root` user
-RUN useradd coder \
+RUN userdel -r ubuntu && \
+    useradd coder \
     --create-home \
     --shell=/bin/bash \
     --uid=1000 \
@@ -30,3 +32,6 @@ RUN useradd coder \
     echo "coder ALL=(ALL) NOPASSWD:ALL" >>/etc/sudoers.d/nopasswd
 
 USER coder
+
+# Set up Codex config
+COPY codex/ /home/coder/.codex/
