@@ -1,5 +1,7 @@
-from transformers import AutoProcessor
+from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
+import cv2
+import numpy as np
 
 # Local InternVL3.5 model directory (HF format with remote code)
 model_path = "models/OpenGVLab/InternVL3_5-30B-A3B"
@@ -8,51 +10,66 @@ model_path = "models/OpenGVLab/InternVL3_5-30B-A3B"
 video_path = "videos/delivery-1.mp4"
 
 # Initialize vLLM with multimodal enabled for video
+# Initialize vLLM with CPU-friendly settings if GPU is unavailable
 llm = LLM(
     model=model_path,
-    gpu_memory_utilization=0.99,
     trust_remote_code=True,
-    limit_mm_per_prompt={"video": 1},
+    enforce_eager=True,
+    # Limit images per prompt; we will treat video as multiple images (frames)
+    limit_mm_per_prompt={"image": 8},
 )
 
-sampling_params = SamplingParams(max_tokens=1024)
+sampling_params = SamplingParams(max_tokens=512)
 
-# Build chat messages using the model's chat template (supports <video> tag)
-video_messages = [
+# Build chat messages using the model's chat template (we will insert <image> tokens per frame)
+messages_base = [
     {"role": "system", "content": "You are a helpful assistant."},
-    {
-        "role": "user",
-        "content": [
-            {"type": "text", "text": "Describe the video in detail."},
-            {"type": "video", "video": video_path},
-        ],
-    },
 ]
 
-# Prepare prompt via the model's chat template
-processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
-prompt = processor.apply_chat_template(
-    video_messages,
+# We will prepare the prompt via the model's chat template after composing messages
+
+# Collect multimodal inputs (here only video). vLLM expects a per-modality list.
+def load_video_frames(path: str, max_frames: int = 8) -> np.ndarray:
+    cap = cv2.VideoCapture(path)
+    frames = []
+    if cap.isOpened():
+        count = 0
+        while count < max_frames:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frames.append(frame)
+            count += 1
+        cap.release()
+    return np.stack(frames) if frames else np.empty((0,))
+
+video_inputs = []
+# Read frames from the example video
+frames_np = load_video_frames(video_path, max_frames=8)
+if frames_np.size != 0:
+    for i in range(frames_np.shape[0]):
+        video_inputs.append(frames_np[i])
+
+mm_data = {}
+if video_inputs:
+    mm_data["image"] = video_inputs
+
+# Compose final messages: user text + one image placeholder per frame
+image_placeholders = [{"type": "image", "image": None} for _ in video_inputs]
+messages = messages_base + [{
+    "role": "user",
+    "content": [{"type": "text", "text": "Describe the video in detail."}] + image_placeholders,
+}]
+
+# vLLM input payload
+tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+prompt = tokenizer.apply_chat_template(
+    messages,
     tokenize=False,
     add_generation_prompt=True,
 )
 
-# Collect multimodal inputs (here only video). vLLM expects a per-modality list.
-video_inputs = []
-for msg in video_messages:
-    content = msg.get("content")
-    if isinstance(content, list):
-        for item in content:
-            if isinstance(item, dict) and item.get("type") == "video":
-                vpath = item.get("video")
-                if vpath:
-                    video_inputs.append(vpath)
-
-mm_data = {}
-if video_inputs:
-    mm_data["video"] = video_inputs
-
-# vLLM input payload
 llm_inputs = {
     "prompt": prompt,
     "multi_modal_data": mm_data,
