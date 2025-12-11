@@ -33,5 +33,8 @@ RUN useradd coder \
 
 USER coder
 
+# install hf
+RUN curl -LsSf https://hf.co/cli/install.sh | bash
+
 # Set up Codex config
 COPY .devcontainer/codex/ /home/coder/.codex/
