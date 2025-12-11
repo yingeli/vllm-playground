@@ -1,10 +1,26 @@
-profile = "azure-gpt5"
+profile = "azure-gpt51-codex-max"
 
 [model_providers.azure]
 name = "Azure"
-base_url = "https://ygeus2.cognitiveservices.azure.com/openai/v1/"
+base_url = "https://ygeus2.cognitiveservices.azure.com/openai/v1"
 wire_api = "responses"
 
-[profiles.azure-gpt5]
-model = "gpt-5"
+[profiles.azure-gpt51]
+model = "gpt-5.1"
 model_provider = "azure"
+model_reasoning_effort = "high"
+
+[profiles.azure-gpt5-pro]
+model = "gpt-5-pro"
+model_provider = "azure"
+model_reasoning_effort = "high"
+
+[profiles.azure-gpt51-codex]
+model = "gpt-5.1-codex"
+model_provider = "azure"
+model_reasoning_effort = "high"
+
+[profiles.azure-gpt51-codex-max]
+model = "gpt-5.1-codex-max"
+model_provider = "azure"
+model_reasoning_effort = "high"
