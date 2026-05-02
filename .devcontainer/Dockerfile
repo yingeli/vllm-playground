@@ -1,4 +1,4 @@
-FROM vllm/vllm-openai:v0.20.0
+FROM vllm/vllm-openai:nightly
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
