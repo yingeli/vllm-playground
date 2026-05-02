@@ -1,26 +1,47 @@
-profile = "azure-gpt51-codex-max"
+profile = "gpt-54"
+
+[model_providers.azure_eus2]
+name = "Azure"
+base_url = "https://ygeus2.cognitiveservices.azure.com/openai/v1"
+env_key = "AZURE_OPENAI_API_KEY_EUS2"
+wire_api = "responses"
 
 [model_providers.azure]
 name = "Azure"
-base_url = "https://ygeus2.cognitiveservices.azure.com/openai/v1"
+base_url = "https://ygsdc.cognitiveservices.azure.com/openai/v1"
+env_key = "AZURE_OPENAI_API_KEY_SDC"
 wire_api = "responses"
 
-[profiles.azure-gpt51]
-model = "gpt-5.1"
-model_provider = "azure"
-model_reasoning_effort = "high"
+[model_providers.azure_jpe]
+name = "Azure"
+base_url = "https://ygjpe.cognitiveservices.azure.com/openai/v1"
+env_key = "AZURE_OPENAI_API_KEY_JPE"
+wire_api = "responses"
 
-[profiles.azure-gpt5-pro]
-model = "gpt-5-pro"
-model_provider = "azure"
-model_reasoning_effort = "high"
+[model_providers.azure_plc]
+name = "Azure"
+base_url = "https://polandcentral-resource.cognitiveservices.azure.com/openai/v1"
+env_key = "AZURE_OPENAI_API_KEY_PLC"
+wire_api = "responses"
 
-[profiles.azure-gpt51-codex]
-model = "gpt-5.1-codex"
-model_provider = "azure"
-model_reasoning_effort = "high"
+[model_providers.azure_scus]
+name = "Azure"
+base_url = "https://southcentralus-resource.cognitiveservices.azure.com/openai/v1"
+env_key = "AZURE_OPENAI_API_KEY_SCUS"
+wire_api = "responses"
 
-[profiles.azure-gpt51-codex-max]
-model = "gpt-5.1-codex-max"
+[profiles.gpt-53-codex]
+model = "gpt-5.3-codex"
 model_provider = "azure"
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
+
+[profiles.gpt-54]
+model = "gpt-5.4"
+model_provider = "azure"
+model_reasoning_effort = "xhigh"
+
+[profiles.gpt-54-pro]
+model = "gpt-5.4-pro"
+model_provider = "azure"
+model_reasoning_effort = "xhigh"
+personality = "pragmatic"
