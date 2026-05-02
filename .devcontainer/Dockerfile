@@ -15,6 +15,9 @@ RUN apt-get update && \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
+# install hf
+# RUN curl -LsSf https://hf.co/cli/install.sh | bash
+
 # Generate the desired locale (en_US.UTF-8)
 RUN locale-gen en_US.UTF-8
 
@@ -33,8 +36,7 @@ RUN useradd coder \
 
 USER coder
 
-# install hf
-RUN curl -LsSf https://hf.co/cli/install.sh | bash
+
 
 # Set up Codex config
 COPY .devcontainer/codex/ /home/coder/.codex/
