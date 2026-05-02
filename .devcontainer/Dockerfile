@@ -36,7 +36,5 @@ RUN useradd coder \
 
 USER coder
 
-
-
 # Set up Codex config
-COPY .devcontainer/codex/ /home/coder/.codex/
+# COPY .devcontainer/codex/ /home/coder/.codex/
